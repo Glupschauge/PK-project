@@ -6,8 +6,7 @@ import java.io.IOError;
 import java.io.IOException;
 import java.awt.*;
 import java.util.*;
-
-
+import java.util.List;
 
 
 /**
@@ -16,8 +15,8 @@ import java.util.*;
 public class Reader
 {
     BufferedReader in;
-    String lastline;
-    patches lastpatch;
+    patches currpatch;
+    List <patches> countrys = new ArrayList<patches>();
 
 
     public void readmap(String dir)
@@ -30,13 +29,12 @@ public class Reader
             String line;
             while ((line = in.readLine()) != null)
             {
-
-                System.out.println(line);
                 Stringhandler(line);
             }
 
 
-        } catch (IOException ex)
+        }
+        catch (IOException ex)
         {
             System.out.println("File error!!");
             return;
@@ -46,31 +44,53 @@ public class Reader
 
     }
 
-    public void Stringhandler(String whole){
+
+
+    public void Stringhandler(String whole)                     //HANDLED bis jetzt nur alle patch-of Zeilen
+    {
         String[] splite= whole.split(" ");
         int start = 0;
 
 
-        if(splite[0].equals("patch-of") || splite[0].equals("capital-of"))
+        if(splite[0].equals("patch-of"))
         {
-            for (int j = 1; digitcon(splite[j]); j++)
+            start = startget(splite);
+
+            String name = nameget(splite, start);
+
+            int[] xcor = makexcor(splite, start);
+            int[] ycor = makeycor(splite, start);
+            if(hasname(name))
             {
-                start = j + 1;
+                currpatch=getname(name);
+                currpatch.addarray(xcor, ycor);
             }
-            if(splite[0].equals(lastline)){
-                lastpatch.addarray(splite, start);}
-            else {
-                String name = splite[1];
-                for(int j = 2; j < start; j++){
-                    name += splite[j];
-                }
-                lastpatch= new patches(name);
-                lastpatch.makearray(splite, start);
-            lastline = splite[0];}
-
-
-            System.out.println(start);
+            else
+            {
+                currpatch= new patches(name, xcor, ycor);
+                countrys.add(currpatch);
+            }
         }
+        if(splite[0].equals("capital-of")){
+            start = startget(splite);
+            String name = nameget(splite, start);
+            int[] xcor = makexcor(splite, start);
+            int[] ycor = makeycor(splite, start);
+
+            if(hasname(name))
+            {
+                currpatch=getname(name);
+                currpatch.addcapital(xcor[0], ycor[0]);
+            }
+            else
+            {
+                System.out.println("FEHLER in DATEI!!!!!");
+                return;
+            }
+
+
+        }
+
 
 
     }
@@ -87,7 +107,8 @@ public class Reader
         }
 
 
-    }
+    }                               //Gibt bool zurück ob String eine Zahl ist !!!!!!!! WERTE VERTAUSCHT!!!!!!!
+
 
     public int[] makexcor (String[] strar, int beg){
         int leng = (strar.length - beg)/2;
@@ -101,20 +122,75 @@ public class Reader
 
 
         return xcor;
-    }
+    }                    //Macht ein int[] mit allen x-koordinaten der Zeile
+
 
     public int[] makeycor (String[] strar, int beg){
         int leng = (strar.length - beg)/2;
-
         int[] xcor = new int[leng];
         for (int j = (beg + 1); j < strar.length; j +=2)
         {
             int index = (j - beg)/2;
             xcor[index] = Integer.parseInt(strar[j]);
         }
-
-
         return xcor;
+    }                   //Macht ein int[] mit allen y-koordinaten der Zeile
+
+
+    public void printcountry(){                                     //Gibt die Namen aller Länder aus
+        System.out.println(countrys.size());
+        int jk=0;
+        for (patches p:countrys)
+        {
+            p.print();
+        }
     }
+
+
+    public boolean hasname(String name){                            //Gibt bool zurück ob es bereits dieses Land gibt
+        boolean gotit = false;
+        for(patches p:countrys)
+        {
+           if(p.hasname(name)){
+              return true;
+           }
+        }
+        return false;
+    }
+
+
+    public patches getname(String name){                            //Gibt das Land zurück wessen Name gleich dem ist des überladenen Strings
+        boolean gotit = false;
+        for(patches p:countrys)
+        {
+            if(p.hasname(name)){
+                return p;
+            }
+            }
+        return null;
+        }
+
+
+    public int startget (String[] check){                           // Gibt den Start der koordinaten im String[] zurück
+        int start = 0;
+        for (int j = 1; digitcon(check[j]); j++)
+        {
+            start = j + 1;
+        }
+
+        return start;
+    }
+
+
+    public String nameget(String[] check, int start){               //Gibt den Namen des Strings zurück
+        String name = check[1];
+        for(int j = 2; j < start; j++)
+        {
+            name += " ";
+            name += check[j];
+        }
+        return name;
+    }
+
 }
 
