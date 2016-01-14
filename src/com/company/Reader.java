@@ -16,6 +16,8 @@ import java.util.*;
 public class Reader
 {
     BufferedReader in;
+    String lastline;
+    patches lastpatch;
 
 
     public void readmap(String dir)
@@ -55,6 +57,17 @@ public class Reader
             {
                 start = j + 1;
             }
+            if(splite[0].equals(lastline)){
+                lastpatch.addarray(splite, start);}
+            else {
+                String name = splite[1];
+                for(int j = 2; j < start; j++){
+                    name += splite[j];
+                }
+                lastpatch= new patches(name);
+                lastpatch.makearray(splite, start);
+            lastline = splite[0];}
+
 
             System.out.println(start);
         }
@@ -74,6 +87,34 @@ public class Reader
         }
 
 
+    }
+
+    public int[] makexcor (String[] strar, int beg){
+        int leng = (strar.length - beg)/2;
+
+        int[] xcor = new int[leng];
+        for (int j = beg; j < strar.length; j +=2)
+        {
+            int index = (j - beg)/2;
+            xcor[index] = Integer.parseInt(strar[j]);
+        }
+
+
+        return xcor;
+    }
+
+    public int[] makeycor (String[] strar, int beg){
+        int leng = (strar.length - beg)/2;
+
+        int[] xcor = new int[leng];
+        for (int j = (beg + 1); j < strar.length; j +=2)
+        {
+            int index = (j - beg)/2;
+            xcor[index] = Integer.parseInt(strar[j]);
+        }
+
+
+        return xcor;
     }
 }
 
