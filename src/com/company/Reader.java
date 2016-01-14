@@ -16,7 +16,11 @@ public class Reader
 {
     BufferedReader in;
     patches currpatch;
+    kontinent currkontinent;
     List <patches> countrys = new ArrayList<patches>();
+    List<patches> currlist = new ArrayList<patches>();
+    List<kontinent> kontinents = new ArrayList<kontinent>();
+
 
 
     public void readmap(String dir)
@@ -87,13 +91,62 @@ public class Reader
                 System.out.println("FEHLER in DATEI!!!!!");
                 return;
             }
+        }
+        if(splite[0].equals("neighbors-of")){
+            start=neighcount(splite);
+            String name=nameget(splite, start);
+            String currname = null;
+            patches curr;
+            start++;
+            for(int index = start; index < splite.length; index++){
+                if(splite[index].equals("-")){
+                    curr = getname(currname);
+                    curr.singleneighbor(getname(name));
+                    currlist.add(curr);
 
+                    currname = null;
+                }else{
+                    if(currname==null){
+                        currname = splite[index];
+                    } else{
+                    currname += (" "+splite[index]);
+                    }
+                }
+            }
+            curr = getname(currname);
+            curr.singleneighbor(getname(name));
+            currlist.add(curr);
+            (getname(name)).listneighbor(currlist);
+            currlist.clear();
+        }
+        if(splite[0].equals("continent")){
+            start=neighcount(splite);
+            String name=nameget(splite, start-1);
+            currkontinent = new kontinent(name,  Integer.parseInt(splite[start-1]) );
+            String currname = null;
+            for(int index = start + 1; index < splite.length; index++){
+                if(splite[index].equals("-")){
+                    currkontinent.addcountry(getname(currname));
+
+                    currname = null;
+                }else{
+                    if(currname==null){
+                        currname = splite[index];
+                    } else{
+                        currname += (" "+splite[index]);
+                    }
+                }
+            }
+
+            currkontinent.addcountry(getname(currname));
+            kontinents.add(currkontinent);
 
         }
 
 
 
     }
+
 
     public boolean digitcon(String test){
         try
@@ -144,6 +197,9 @@ public class Reader
         {
             p.print();
         }
+        for (kontinent k:kontinents){
+            k.print();
+        }
     }
 
 
@@ -191,6 +247,19 @@ public class Reader
         }
         return name;
     }
+
+    public int neighcount(String[] check){
+
+        int start = 0;
+        for (int j = 1; !check[j].equals(":"); j++)
+        {
+            start = j + 1;
+        }
+
+        return start;
+    }
+
+
 
 }
 
