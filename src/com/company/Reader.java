@@ -55,6 +55,7 @@ public class Reader
             {
                 start = j + 1;
             }
+
             System.out.println(start);
         }
 
